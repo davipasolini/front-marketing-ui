@@ -5,99 +5,91 @@ const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
 
 function addMessage(text, sender) {
+    const div = document.createElement("div");
 
-```
-const div = document.createElement("div");
+    div.classList.add("message");
 
-div.classList.add("message");
+    if (sender === "user") {
+        div.classList.add("user");
+    } else {
+        div.classList.add("bot");
+    }
 
-if(sender === "user"){
-    div.classList.add("user");
-}else{
-    div.classList.add("bot");
-}
+    div.innerText = text;
 
-div.innerText = text;
-
-chat.appendChild(div);
-
-chat.scrollTop = chat.scrollHeight;
-```
-
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
 }
 
 async function sendMessage() {
 
-```
-const message = input.value.trim();
+    const message = input.value.trim();
 
-if(!message) return;
+    if (!message) return;
 
-addMessage(message,"user");
+    addMessage(message, "user");
 
-input.value = "";
+    input.value = "";
 
-const loading = document.createElement("div");
-loading.classList.add("message","bot");
-loading.innerText = "🧠 Flow Marketing AI está pensando...";
-chat.appendChild(loading);
+    const loading = document.createElement("div");
+    loading.classList.add("message", "bot");
+    loading.innerText = "🧠 Flow Marketing AI está pensando...";
 
-chat.scrollTop = chat.scrollHeight;
+    chat.appendChild(loading);
 
-try{
+    try {
 
-    const response = await fetch(API_URL,{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            message
-        })
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: message
+            })
+        });
+
+        const data = await response.json();
+
+        loading.remove();
+
+        addMessage(
+            data.reply || "Nenhuma resposta recebida.",
+            "bot"
+        );
+
+    } catch (error) {
+
+        loading.remove();
+
+        addMessage(
+            "Erro ao conectar com o servidor.",
+            "bot"
+        );
+
+        console.error(error);
+
+    }
+}
+
+sendBtn.addEventListener("click", sendMessage);
+
+input.addEventListener("keypress", (e) => {
+
+    if (e.key === "Enter") {
+        sendMessage();
+    }
+
+});
+
+document.querySelectorAll(".nav-btn").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        input.value = btn.dataset.prompt;
+
+        sendMessage();
+
     });
 
-    const data = await response.json();
-
-    loading.remove();
-
-    addMessage(
-        data.reply || "Nenhuma resposta recebida.",
-        "bot"
-    );
-
-}catch(error){
-
-    loading.remove();
-
-    addMessage(
-        "Erro ao conectar com o servidor.",
-        "bot"
-    );
-
-    console.error(error);
-}
-```
-
-}
-
-sendBtn.addEventListener("click",sendMessage);
-
-input.addEventListener("keypress",(e)=>{
-if(e.key === "Enter"){
-sendMessage();
-}
 });
-
-document.querySelectorAll(".nav-btn").forEach(btn=>{
-
-```
-btn.addEventListener("click",()=>{
-
-    input.value = btn.dataset.prompt;
-
-    sendMessage();
-});
-```
-
-});
-
